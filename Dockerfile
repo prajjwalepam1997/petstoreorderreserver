@@ -1,5 +1,8 @@
 # Build stage
-FROM mcr.microsoft.com/azure-functions/java:4-java17 AS installer-env
+FROM mcr.microsoft.com/java/jdk:17-zulu-ubuntu AS installer-env
+
+# Install Maven
+RUN apt-get update && apt-get install -y maven
 
 # Set the working directory
 WORKDIR /src
