@@ -9,4 +9,4 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "/azure-functions-host/Microsoft.Azure.WebJobs.Script.WebHost.jar"]
