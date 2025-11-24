@@ -14,6 +14,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <functionAppName>OrderItemsReserver</functionAppName>
     </properties>
 
     <dependencies>
@@ -58,13 +59,10 @@
                 <artifactId>azure-functions-maven-plugin</artifactId>
                 <version>1.20.0</version>
                 <configuration>
-                    <appName>OrderItemsReserver</appName>
-                    <appSettings>
-                        <property>
-                            <name>FUNCTIONS_EXTENSION_VERSION</name>
-                            <value>~4</value>
-                        </property>
-                    </appSettings>
+                    <appName>${functionAppName}</appName>
+                    <runtime>
+                        <os>linux</os>
+                    </runtime>
                 </configuration>
                 <executions>
                     <execution>
