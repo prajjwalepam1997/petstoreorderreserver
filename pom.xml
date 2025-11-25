@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.azure</groupId>
     <artifactId>petstoreorderreserver</artifactId>
-    <version>1.0.0</version>
+    <version>0.0.1-SNAPSHOT.jar</version>
     <packaging>jar</packaging>
     <name>OrderItemsReserver</name>
     <description>Azure Function to save JSON payload to Azure Blob Storage</description>
