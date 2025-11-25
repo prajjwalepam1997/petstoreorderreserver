@@ -1,9 +1,11 @@
-# Stage 1: Build the Java function app
-FROM maven:3.9.6-eclipse-temurin-17 AS build
-WORKDIR /app
-COPY . .
-RUN mvn clean package
+# Use the Azure Functions base image
+FROM mcr.microsoft.com/azure-functions/java:4-java17-appservice
 
-# Stage 2: Copy the built function app to the Azure Functions base image
-FROM mcr.microsoft.com/azure-functions/java:4-java17
-COPY --from=build /app/target/*.jar /home/site/wwwroot/
+ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
+    AzureFunctionsJobHost__Logging__Console__IsEnabled=true
+
+# Copy the function app
+COPY target/azure-functions/petstoreorderreserver-*/ /home/site/wwwroot/
+
+# Install any additional dependencies if needed
+RUN cd /home/site/wwwroot
