@@ -1,4 +1,4 @@
-package com.azure.OrderItemsReserver;
+﻿package com.azure.OrderItemsReserver;
 
 import com.azure.core.util.BinaryData;
 import com.azure.storage.blob.BlobContainerClient;
@@ -8,11 +8,9 @@ import com.azure.storage.blob.specialized.BlockBlobClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.azure.functions.*;
-import com.microsoft.azure.functions.annotation.AuthorizationLevel;
 import com.microsoft.azure.functions.annotation.FunctionName;
-import com.microsoft.azure.functions.annotation.HttpTrigger;
+import com.microsoft.azure.functions.annotation.ServiceBusQueueTrigger;
 
-import java.util.Optional;
 
 public class SaveJsonToBlobFunction {
 
@@ -20,23 +18,22 @@ public class SaveJsonToBlobFunction {
     private static final String CONTAINER_NAME = "orderitemreserver";
 
     @FunctionName("SaveJsonToBlob")
-    public HttpResponseMessage run(
-            @HttpTrigger(
-                    name = "req",
-                    methods = {HttpMethod.POST},
-                    authLevel = AuthorizationLevel.ANONYMOUS
-            ) HttpRequestMessage<Optional<String>> request,
+    public void run(
+            @ServiceBusQueueTrigger(
+                    name = "message",
+                    queueName = "orderqueue",
+                    connection = "ServiceBusConnection"
+            ) String message,
             final ExecutionContext context) {
 
-        context.getLogger().info("Java HTTP trigger processed a request.");
+        context.getLogger().info("Service Bus Queue trigger processed a message.");
 
         try {
-            // Get JSON body
-            String jsonBody = request.getBody().orElse("");
-            if (jsonBody.isEmpty()) {
-                return request.createResponseBuilder(HttpStatus.BAD_REQUEST)
-                        .body("Request body is empty")
-                        .build();
+            // Get JSON from queue message
+            String jsonBody = message;
+            if (jsonBody == null || jsonBody.isEmpty()) {
+                context.getLogger().warning("Queue message is empty");
+                return;
             }
 
             // Parse JSON to get the id field
@@ -44,9 +41,8 @@ public class SaveJsonToBlobFunction {
             JsonNode jsonNode = mapper.readTree(jsonBody);
 
             if (!jsonNode.has("id")) {
-                return request.createResponseBuilder(HttpStatus.BAD_REQUEST)
-                        .body("Missing 'id' field in JSON")
-                        .build();
+                context.getLogger().warning("Missing 'id' field in JSON");
+                return;
             }
 
             String id = jsonNode.get("id").asText();
@@ -61,7 +57,7 @@ public class SaveJsonToBlobFunction {
                     .connectionString(CONNECTION_STRING)
                     .buildClient();
 
-            // Get container client and create if doesn't exist
+            // Get container client and create if it doesn't exist
             BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME);
             if (!containerClient.exists()) {
                 containerClient.create();
@@ -74,15 +70,9 @@ public class SaveJsonToBlobFunction {
 
             context.getLogger().info("Successfully saved blob: " + id + ".json");
 
-            return request.createResponseBuilder(HttpStatus.OK)
-                    .body("File saved as " + id + ".json")
-                    .build();
-
         } catch (Exception e) {
-            context.getLogger().severe("Error processing request: " + e.getMessage());
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: " + e.getMessage())
-                    .build();
+            context.getLogger().severe("Error processing message: " + e.getMessage());
+            throw new RuntimeException("Failed to process queue message", e);
         }
     }
 }
