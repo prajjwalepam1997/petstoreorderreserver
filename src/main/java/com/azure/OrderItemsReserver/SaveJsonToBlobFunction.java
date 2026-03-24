@@ -1,4 +1,4 @@
-﻿package com.azure.OrderItemsReserver;
+package com.azure.OrderItemsReserver;
 
 import com.azure.core.util.BinaryData;
 import com.azure.storage.blob.BlobContainerClient;
@@ -21,7 +21,7 @@ public class SaveJsonToBlobFunction {
     public void run(
             @ServiceBusQueueTrigger(
                     name = "message",
-                    queueName = "orderqueue",
+                    queueName = "order",
                     connection = "ServiceBusConnection"
             ) String message,
             final ExecutionContext context) {
