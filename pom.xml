@@ -63,6 +63,7 @@
                     <resourceGroup>java-functions-group</resourceGroup>
                     <appName>${functionAppName}</appName>
                     <region>${functionAppRegion}</region>
+                    <skipInstallExtensions>true</skipInstallExtensions>
                     <runtime>
                         <os>docker</os>
                         <javaVersion>17</javaVersion>
