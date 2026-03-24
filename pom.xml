@@ -58,7 +58,7 @@
             <plugin>
                 <groupId>com.microsoft.azure</groupId>
                 <artifactId>azure-functions-maven-plugin</artifactId>
-                <version>1.20.0</version>
+                <version>1.21.0</version>
                 <configuration>
                     <resourceGroup>java-functions-group</resourceGroup>
                     <appName>${functionAppName}</appName>
